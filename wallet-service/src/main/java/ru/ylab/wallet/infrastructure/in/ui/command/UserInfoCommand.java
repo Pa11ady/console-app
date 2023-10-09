@@ -34,7 +34,7 @@ public class UserInfoCommand implements Command {
         UserInfoResponse userInfo = response.get();
         out.println("Пользователь: " + userInfo.fullName());
         out.println("Логин: " + userInfo.login());
-        out.printf(Locale.US, "Баланс: %.2f\n", userInfo.userBalance() / 100.0);
+        out.printf(Locale.US, "Баланс: %.2f\n", userInfo.balance() / 100.0);
         return true;
     }
 }

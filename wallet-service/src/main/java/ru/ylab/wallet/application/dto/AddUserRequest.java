@@ -3,7 +3,7 @@ package ru.ylab.wallet.application.dto;
 import java.util.UUID;
 
 public record AddUserRequest(
-        UUID id,
+        UUID userId,
         String fullName,
         String login,
         String password) {
