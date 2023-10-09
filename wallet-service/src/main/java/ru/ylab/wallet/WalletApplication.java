@@ -5,10 +5,7 @@ import ru.ylab.wallet.infrastructure.in.ui.Command;
 import ru.ylab.wallet.infrastructure.in.ui.ConsoleInput;
 import ru.ylab.wallet.infrastructure.in.ui.CommandProcessor;
 import ru.ylab.wallet.infrastructure.in.ui.Input;
-import ru.ylab.wallet.infrastructure.in.ui.command.ExitCommand;
-import ru.ylab.wallet.infrastructure.in.ui.command.LoginCommand;
-import ru.ylab.wallet.infrastructure.in.ui.command.RegistrationCommand;
-import ru.ylab.wallet.infrastructure.in.ui.command.UserInfoCommand;
+import ru.ylab.wallet.infrastructure.in.ui.command.*;
 
 import java.util.List;
 
@@ -18,12 +15,16 @@ public class WalletApplication {
         WalletFacade walletFacade = new WalletFacade();
         List<Command> subCommands = List.of(
                 new UserInfoCommand(walletFacade),
+                new CreditCommand(in, walletFacade),
+                new DebitCommand(in, walletFacade),
+                new TransactionHistoryCommand(in, walletFacade),
                 new ExitCommand("==== Выход из профиля")
         );
         CommandProcessor subCommandProcessor = new CommandProcessor(in, subCommands);
         List<Command> commands = List.of(
                 new RegistrationCommand(in, walletFacade),
                 new LoginCommand(in, walletFacade, subCommandProcessor),
+                new AuditCommand(in, walletFacade),
                 new ExitCommand("Завершить работу")
         );
         new CommandProcessor(in, commands).start();

@@ -3,6 +3,7 @@ package ru.ylab.wallet.infrastructure.in.ui.command;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.WalletFacade;
 import ru.ylab.wallet.application.dto.AddUserRequest;
+import ru.ylab.wallet.application.exception.LoginNotUniqueException;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
 import ru.ylab.wallet.infrastructure.in.ui.Input;
 
@@ -27,8 +28,11 @@ public class RegistrationCommand implements Command {
         String login = in.askString("Введите логин: ");
         String password = in.askString("Введите пароль: ");
         UUID id = UUID.randomUUID();
-        walletFacade.registerUser(new AddUserRequest(id, fullName, login, password));
-        out.println("Регистрация завершена");
+        try {
+            walletFacade.registerUser(new AddUserRequest(id, fullName, login, password));
+        } catch (LoginNotUniqueException exception) {
+            out.println(exception.getMessage());
+        }
         return true;
     }
 }
