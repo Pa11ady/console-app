@@ -1,57 +1,99 @@
 package ru.ylab.wallet.application;
 
+import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.dto.*;
 import ru.ylab.wallet.application.exception.LoginNotUniqueException;
 import ru.ylab.wallet.application.exception.TransactionIdNotUniqueException;
+import ru.ylab.wallet.domain.model.Event;
+import ru.ylab.wallet.domain.model.Transaction;
+import ru.ylab.wallet.domain.model.User;
+import ru.ylab.wallet.domain.service.EventService;
+import ru.ylab.wallet.domain.service.TransactionService;
+import ru.ylab.wallet.domain.service.UserService;
 
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
+@RequiredArgsConstructor
 public class WalletFacade {
+    private final UserService userService;
+    private final TransactionService transactionService;
+    private final EventService eventService;
+
     public void registerUser(AddUserRequest request) {
-        throw new LoginNotUniqueException();
+        if (userService.findUserByLogin(request.login()).isPresent()) {
+            throw new LoginNotUniqueException();
+        }
+        userService.createUser(new User(
+                request.userId(),
+                request.fullName(),
+                request.login(),
+                request.password(),
+                0L
+        ));
     }
 
     public Optional<UUID> authenticate(AuthenticationRequest request) {
-        return Optional.of(UUID.randomUUID());
+        Optional<User> userOptional = userService.findUserByLogin(request.login());
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        User user = userOptional.get();
+        if (Objects.equals(user.getPassword(), request.password())) {
+            return Optional.of(user.getId());
+        }
+        return Optional.empty();
     }
 
-    public Optional<UserInfoResponse> getUserInfo(UUID id) {
-        return Optional.of(new UserInfoResponse("Name", "login", 101));
+    public Optional<UserInfoResponse> getUserInfo(UUID userId) {
+        Optional<User> userOptional = userService.findUserById(userId);
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+        User user = userOptional.get();
+        return Optional.of(new UserInfoResponse(
+                user.getFullName(),
+                user.getLogin(),
+                user.getBalance()
+        ));
     }
 
     public void createDebitTransaction(AddTransactionRequest request) {
-        throw new TransactionIdNotUniqueException();
+        if (transactionService.findTransactionById(request.transactionId()).isPresent()) {
+            throw new TransactionIdNotUniqueException();
+        }
+
     }
 
     public void createCreditTransaction(AddTransactionRequest request) {
-        throw new TransactionIdNotUniqueException();
+        if (transactionService.findTransactionById(request.transactionId()).isPresent()) {
+            throw new TransactionIdNotUniqueException();
+        }
     }
 
     public List<TransactionResponse> transactionHistory(UUID userId) {
-        OffsetDateTime dateTime = OffsetDateTime.now();
-        List<TransactionResponse> transactions = Stream.of(
-                new TransactionResponse(UUID.randomUUID(), dateTime.plusMinutes(20), 2000),
-                new TransactionResponse(UUID.randomUUID(), dateTime.plusMinutes(10), 1000),
-                new TransactionResponse(UUID.randomUUID(), dateTime, -100)
+        List<TransactionResponse> result = new ArrayList<>();
+        List<Transaction> transactions = transactionService.findAllByUserId(userId);
 
-        ).collect(Collectors.toCollection(ArrayList::new));
-        return transactions;
+        for (Transaction transaction : transactions) {
+            result.add(new TransactionResponse(
+                    transaction.getTransactionId(),
+                    transaction.getTransactionDate(),
+                    transaction.getAmount()
+            ));
+        }
+        return result;
     }
 
     public List<EventResponse> getAllEvents() {
-        OffsetDateTime dateTime = OffsetDateTime.now();
-        return Stream.of(
-                new EventResponse("user1", dateTime.plusMinutes(20), "логин"),
-                new EventResponse("user1", dateTime.plusMinutes(10), "пополнение 10"),
-                new EventResponse("user1", dateTime.plusMinutes(30), "вход"),
-                new EventResponse("tttt", dateTime.plusMinutes(21), "снятие денег 10"),
-                new EventResponse("taa", dateTime.plusMinutes(21), "пополнение 123")
-        ).collect(Collectors.toCollection(ArrayList::new));
+        List<EventResponse> result = new ArrayList<>();
+        List<Event> events = eventService.findAll();
+        for (Event event : events) {
+            result.add(new EventResponse(
+                    event.getUserLogin(),
+                    event.getEventDate(),
+                    event.getDescription()
+            ));
+        }
+        return result;
     }
 }

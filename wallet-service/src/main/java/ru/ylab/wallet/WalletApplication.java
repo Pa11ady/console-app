@@ -1,6 +1,9 @@
 package ru.ylab.wallet;
 
 import ru.ylab.wallet.application.WalletFacade;
+import ru.ylab.wallet.domain.service.EventService;
+import ru.ylab.wallet.domain.service.TransactionService;
+import ru.ylab.wallet.domain.service.UserService;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
 import ru.ylab.wallet.infrastructure.in.ui.ConsoleInput;
 import ru.ylab.wallet.infrastructure.in.ui.CommandProcessor;
@@ -12,7 +15,10 @@ import java.util.List;
 public class WalletApplication {
     public static void main(String[] args) {
         Input in = new ConsoleInput();
-        WalletFacade walletFacade = new WalletFacade();
+        UserService userService = new UserService();
+        TransactionService transactionService = new TransactionService();
+        EventService eventService = new EventService();
+        WalletFacade walletFacade = new WalletFacade(userService, transactionService, eventService);
         List<Command> subCommands = List.of(
                 new UserInfoCommand(walletFacade),
                 new CreditCommand(in, walletFacade),
