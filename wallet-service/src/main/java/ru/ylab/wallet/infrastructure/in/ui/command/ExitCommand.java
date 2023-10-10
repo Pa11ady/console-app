@@ -1,7 +1,5 @@
 package ru.ylab.wallet.infrastructure.in.ui.command;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
 

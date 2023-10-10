@@ -2,7 +2,11 @@ package ru.ylab.wallet.domain.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+
+/**
+ * Перечисление, представляющее типы событий в системе для аудита.
+ * Используется при создании описания события.
+ */
 
 @RequiredArgsConstructor
 @Getter

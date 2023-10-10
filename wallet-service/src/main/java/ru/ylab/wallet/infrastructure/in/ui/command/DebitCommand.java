@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.WalletFacade;
 import ru.ylab.wallet.application.dto.AddTransactionRequest;
 import ru.ylab.wallet.application.exception.NotEnoughMoneyException;
-import ru.ylab.wallet.application.exception.TransactionIdNotUniqueException;
+import ru.ylab.wallet.domain.exception.TransactionIdNotUniqueException;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
 import ru.ylab.wallet.infrastructure.in.ui.Input;
-import ru.ylab.wallet.infrastructure.in.ui.RubleConverter;
+import ru.ylab.wallet.common.RubleConverter;
 
 import java.io.PrintStream;
 import java.util.UUID;
@@ -33,6 +33,10 @@ public class DebitCommand implements Command {
         try {
             long amount = RubleConverter.rublesToKopecks(in.askString("Введите сумму операции "));
             walletFacade.createDebitTransaction(new AddTransactionRequest(token, transactionId, amount));
+            if (amount <= 0) {
+                out.print("Сумма операции должна быть больше 0");
+                return true;
+            }
         } catch (NumberFormatException e) {
             out.print("==Неверный формат. Разделитель дроби точка==");
         } catch (TransactionIdNotUniqueException | NotEnoughMoneyException exception) {

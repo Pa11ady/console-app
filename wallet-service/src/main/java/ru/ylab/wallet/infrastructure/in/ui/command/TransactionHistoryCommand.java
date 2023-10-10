@@ -3,8 +3,8 @@ package ru.ylab.wallet.infrastructure.in.ui.command;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.WalletFacade;
 import ru.ylab.wallet.application.dto.TransactionResponse;
+import ru.ylab.wallet.common.RubleConverter;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
-import ru.ylab.wallet.infrastructure.in.ui.Input;
 
 import java.io.PrintStream;
 import java.util.Comparator;
@@ -37,7 +37,8 @@ public class TransactionHistoryCommand implements Command {
         out.println("Номер\t\tСумма");
         int i = 1;
         for (TransactionResponse transaction : transactions) {
-            out.printf(Locale.US, "%-6d\t\t%.2f%n", i, transaction.amount() / 100.0);
+            out.printf(Locale.US, "%-6d\t\t%s%n", i, RubleConverter.kopecksToRubles(transaction.amount()));
+            //out.printf(Locale.US, "%-6d\t\t%.2f%n", i, transaction.amount() / 100.0);
             i++;
         }
         return true;

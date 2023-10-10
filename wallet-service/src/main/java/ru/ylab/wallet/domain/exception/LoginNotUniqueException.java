@@ -1,4 +1,8 @@
-package ru.ylab.wallet.application.exception;
+package ru.ylab.wallet.domain.exception;
+
+/**
+ * Исключение выбрасывается если логин пользователя не является уникальным.
+ */
 
 public class LoginNotUniqueException extends RuntimeException {
     public LoginNotUniqueException(String message) {

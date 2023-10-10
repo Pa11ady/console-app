@@ -2,9 +2,7 @@ package ru.ylab.wallet.infrastructure.storage.memory;
 
 import ru.ylab.wallet.domain.EventRepository;
 import ru.ylab.wallet.domain.model.Event;
-import ru.ylab.wallet.domain.model.EventType;
 
-import java.time.OffsetDateTime;
 import java.util.*;
 
 public class MemoryEventRepository implements EventRepository {

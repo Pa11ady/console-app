@@ -5,7 +5,7 @@ import ru.ylab.wallet.domain.model.User;
 
 import java.util.*;
 
-public class MemoryStubUserRepository implements UserRepository {
+public class MemoryUserRepository implements UserRepository {
     private final Map<UUID, User> userMap = new HashMap<>();
 
     @Override

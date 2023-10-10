@@ -1,7 +1,11 @@
 package ru.ylab.wallet.application.dto;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
+
+/**
+ * DTO класс ответа, который содержит информацию о событии (Аудит).
+ * В описании события действия совершённые пользователем.
+ */
 
 public record EventResponse(
         String userLogin,

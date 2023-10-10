@@ -3,7 +3,7 @@ package ru.ylab.wallet.infrastructure.in.ui.command;
 import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.WalletFacade;
 import ru.ylab.wallet.application.dto.AddUserRequest;
-import ru.ylab.wallet.application.exception.LoginNotUniqueException;
+import ru.ylab.wallet.domain.exception.LoginNotUniqueException;
 import ru.ylab.wallet.infrastructure.in.ui.Command;
 import ru.ylab.wallet.infrastructure.in.ui.Input;
 

@@ -2,10 +2,9 @@ package ru.ylab.wallet.application;
 
 import lombok.RequiredArgsConstructor;
 import ru.ylab.wallet.application.dto.*;
-import ru.ylab.wallet.application.exception.LoginNotUniqueException;
 import ru.ylab.wallet.application.exception.NotEnoughMoneyException;
-import ru.ylab.wallet.application.exception.TransactionIdNotUniqueException;
-import ru.ylab.wallet.application.exception.UserNotFoundException;
+import ru.ylab.wallet.common.RubleConverter;
+import ru.ylab.wallet.domain.exception.UserNotFoundException;
 import ru.ylab.wallet.domain.model.Event;
 import ru.ylab.wallet.domain.model.EventType;
 import ru.ylab.wallet.domain.model.Transaction;
@@ -17,6 +16,13 @@ import ru.ylab.wallet.domain.service.UserService;
 import java.time.OffsetDateTime;
 import java.util.*;
 
+/**
+ * Этот в какой-то степени фасад для взаимодействия с внешними слоями луковичной архитектуры.
+ * По сути это бизнес логика более высокого уровня. Возможно он нарушает принципы SOLID, так как
+ * много берёт на себя, но он нужен чтобы инкапсулировать и собрать внутреннею бизнес логику.
+ * Он обеспечивает управление пользователями, транзакциями и событиями в приложении.
+ */
+
 @RequiredArgsConstructor
 public class WalletFacade {
     private final UserService userService;
@@ -24,9 +30,6 @@ public class WalletFacade {
     private final EventService eventService;
 
     public void registerUser(AddUserRequest request) {
-        if (userService.findUserByLogin(request.login()).isPresent()) {
-            throw new LoginNotUniqueException();
-        }
         userService.createUser(new User(
                 request.userId(),
                 request.fullName(),
@@ -68,9 +71,7 @@ public class WalletFacade {
         if (user.getBalance() - amount < 0) {
             throw new NotEnoughMoneyException();
         }
-        if (transactionService.findTransactionById(request.transactionId()).isPresent()) {
-            throw new TransactionIdNotUniqueException();
-        }
+
         transactionService.createTransaction(new Transaction(
                 request.userId(),
                 request.transactionId(),
@@ -79,24 +80,21 @@ public class WalletFacade {
         ));
         user.setBalance(user.getBalance() - amount);
         userService.updateUser(user);
-        recordEvent(user, EventType.DEBIT, String.valueOf(-request.amount()));
+        recordEvent(user, EventType.DEBIT, RubleConverter.kopecksToRubles(-request.amount()));
     }
 
     public void createCreditTransaction(AddTransactionRequest request) {
         User user = userService.findUserById(request.userId()).orElseThrow(UserNotFoundException::new);
         long amount = Math.abs(request.amount());
-        if (transactionService.findTransactionById(request.transactionId()).isPresent()) {
-            throw new TransactionIdNotUniqueException();
-        }
         transactionService.createTransaction(new Transaction(
                 request.userId(),
                 request.transactionId(),
                 OffsetDateTime.now(),
                 request.amount()
         ));
-        user.setBalance(user.getBalance() - amount);
+        user.setBalance(user.getBalance() + amount);
         userService.updateUser(user);
-        recordEvent(user, EventType.CREDIT, String.valueOf(request.amount()));
+        recordEvent(user, EventType.CREDIT, RubleConverter.kopecksToRubles(request.amount()));
     }
 
     public List<TransactionResponse> transactionHistory(UUID userId) {
@@ -142,6 +140,5 @@ public class WalletFacade {
                 user.getLogin(),
                 OffsetDateTime.now(),
                 text));
-        System.out.println(text);
     }
 }
