@@ -18,7 +18,12 @@ public class CommandProcessor {
     private UUID token = null;
 
     @Setter
-    private String caption = "Меню:";
+    private String caption = """
+            
+            ==================================
+                            Меню
+            ==================================
+            """;
 
     public void start() {
         int select;

@@ -41,6 +41,7 @@ public class AuditCommand implements Command {
         }
         events.sort(Comparator.comparing(EventResponse::userLogin).thenComparing(EventResponse::eventDate));
         int i = 1;
+        out.printf("%n%-5s\t%-20s\t%-10s\t\t\t%s%n", "Номер", "Логин", "Дата", "Описание");
         for (EventResponse event : events) {
             out.printf("%-5s\t%-20s\t%-10s\t%s%n",
                     i, event.userLogin(), event.eventDate().format(formatter), event.description());
