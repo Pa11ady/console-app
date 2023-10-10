@@ -13,13 +13,13 @@ import java.util.Locale;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public class TransactionHistoryCommand implements Command {
+public class LogoutCommand implements Command {
     private final PrintStream out = System.out;
     private final WalletFacade walletFacade;
 
     @Override
     public String name() {
-        return "История операций";
+        return "==== Выход из профиля";
     }
 
     @Override
@@ -27,19 +27,7 @@ public class TransactionHistoryCommand implements Command {
         if (token == null) {
             return false;
         }
-        out.println("=== История ===");
-        List<TransactionResponse> transactions = walletFacade.transactionHistory(token);
-        if (transactions.isEmpty()) {
-            out.println("История пуста!");
-            return true;
-        }
-        transactions.sort(Comparator.comparing(TransactionResponse::transactionDate));
-        out.println("Номер\t\tСумма");
-        int i = 1;
-        for (TransactionResponse transaction : transactions) {
-            out.printf(Locale.US, "%-6d\t\t%.2f%n", i, transaction.amount() / 100.0);
-            i++;
-        }
-        return true;
+        walletFacade.logout(token);
+        return false;
     }
 }

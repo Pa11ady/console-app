@@ -96,4 +96,8 @@ public class WalletFacade {
         }
         return result;
     }
+
+    public void logout(UUID token) {
+        System.out.println("Выход из профиля");
+    }
 }

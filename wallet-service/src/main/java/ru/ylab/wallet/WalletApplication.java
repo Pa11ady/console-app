@@ -23,8 +23,8 @@ public class WalletApplication {
                 new UserInfoCommand(walletFacade),
                 new CreditCommand(in, walletFacade),
                 new DebitCommand(in, walletFacade),
-                new TransactionHistoryCommand(in, walletFacade),
-                new ExitCommand("==== Выход из профиля")
+                new TransactionHistoryCommand(walletFacade),
+                new LogoutCommand(walletFacade)
         );
         CommandProcessor subCommandProcessor = new CommandProcessor(in, subCommands);
         List<Command> commands = List.of(
