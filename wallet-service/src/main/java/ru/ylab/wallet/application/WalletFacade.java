@@ -29,6 +29,11 @@ public class WalletFacade {
     private final TransactionService transactionService;
     private final EventService eventService;
 
+    /**
+     * Регистрация нового пользователя на кошельке.
+     *
+     * @param request DTO запроса на добавление пользователя.
+     */
     public void registerUser(AddUserRequest request) {
         userService.createUser(new User(
                 request.userId(),
@@ -39,6 +44,12 @@ public class WalletFacade {
         ));
     }
 
+    /**
+     * Аутентификация пользователя по логину и паролю.
+     *
+     * @param request Запрос на аутентификацию.
+     * @return Идентификатор пользователя в случае успешной аутентификации, иначе Optional.empty().
+     */
     public Optional<UUID> authenticate(AuthenticationRequest request) {
         Optional<User> userOptional = userService.findUserByLogin(request.login());
         if (userOptional.isEmpty()) {
@@ -52,6 +63,12 @@ public class WalletFacade {
         return Optional.empty();
     }
 
+    /**
+     * Получение информации о пользователе.
+     *
+     * @param userId Идентификатор пользователя.
+     * @return DTO Информация о пользователе или Optional.empty(), если пользователь не найден.
+     */
     public Optional<UserInfoResponse> getUserInfo(UUID userId) {
         Optional<User> userOptional = userService.findUserById(userId);
         if (userOptional.isEmpty()) {
@@ -65,6 +82,11 @@ public class WalletFacade {
         ));
     }
 
+    /**
+     * Создание дебетовой транзакции на кошельке пользователя. Списание средств.
+     *
+     * @param request Запрос DTO на создание транзакции.
+     */
     public void createDebitTransaction(AddTransactionRequest request) {
         User user = userService.findUserById(request.userId()).orElseThrow(UserNotFoundException::new);
         long amount = Math.abs(request.amount());
@@ -83,6 +105,11 @@ public class WalletFacade {
         recordEvent(user, EventType.DEBIT, RubleConverter.kopecksToRubles(-request.amount()));
     }
 
+    /**
+     * Создание кредитной транзакции на кошельке пользователя.  Пополнение средств.
+     *
+     * @param request Запрос на создание транзакции.
+     */
     public void createCreditTransaction(AddTransactionRequest request) {
         User user = userService.findUserById(request.userId()).orElseThrow(UserNotFoundException::new);
         long amount = Math.abs(request.amount());
@@ -97,6 +124,12 @@ public class WalletFacade {
         recordEvent(user, EventType.CREDIT, RubleConverter.kopecksToRubles(request.amount()));
     }
 
+    /**
+     * Получение истории операций пользователя.
+     *
+     * @param userId Идентификатор пользователя.
+     * @return Список операций пользователя.
+     */
     public List<TransactionResponse> transactionHistory(UUID userId) {
         List<TransactionResponse> result = new ArrayList<>();
         List<Transaction> transactions = transactionService.findAllByUserId(userId);
@@ -110,6 +143,11 @@ public class WalletFacade {
         return result;
     }
 
+    /**
+     * Получение списка всех событий. Аудит действий пользователя.
+     *
+     * @return Список всех событий.
+     */
     public List<EventResponse> getAllEvents() {
         List<EventResponse> result = new ArrayList<>();
         List<Event> events = eventService.findAll();
@@ -123,6 +161,11 @@ public class WalletFacade {
         return result;
     }
 
+    /**
+     * Выход пользователя из профиля.
+     *
+     * @param token Идентификатор пользователя.
+     */
     public void logout(UUID token) {
         System.out.println("Выход из профиля");
         userService.findUserById(token).ifPresent(user -> recordEvent(user, EventType.LOGOUT, ""));
